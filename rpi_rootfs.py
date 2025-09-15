@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 #
 #
 #
@@ -58,10 +58,24 @@ def rsync_get_include_option(user):
 
 #
 def process_rsync_rootfs(user, path):
+    # Get data dir so this copmmand can be used outside of rpi_rootfs dir/repo
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    data_file_inc_path = os.path.join(script_dir, 'data', 'rsync_include_list.txt')
+    data_file_exc_path = os.path.join(script_dir, 'data', 'rsync_exclude_list.txt')
+    
+    #print (f"Include path = {data_file_inc_path}")
+    #print (f"Exclude path = {data_file_exc_path}")
+
+    data_file_include_spec = f"--include-from={data_file_inc_path}"
+    data_file_exclude_spec = f"--exclude-from={data_file_exc_path}"
+
+    #print (f"Include spec = {data_file_include_spec}")
+    #print (f"Exclude spec = {data_file_exclude_spec}")
+
     # Building rsync command line
     rsync_full_command = rsync_cmd + rsync_options  + \
-            ["--include-from=data/rsync_include_list.txt"] + \
-            ["--exclude-from=data/rsync_exclude_list.txt"] + \
+            [data_file_include_spec] + \
+            [data_file_exclude_spec] + \
             [rsync_get_include_option(user)] + [path]
     print(rsync_full_command)
     ret = subprocess.call(rsync_full_command, shell=False)
@@ -115,7 +129,7 @@ def process_relativelinks(path):
 def symlink_force(target, link_name):
     try:
         os.symlink(target, link_name)
-    except OSError, e:
+    except (OSError, e):
         if e.errno == errno.EEXIST:
             os.remove(link_name)
             os.symlink(target, link_name)
@@ -149,20 +163,20 @@ def inplace_change(filename, old_string, new_string):
     with open(filename) as f:
         s = f.read()
         if old_string not in s:
-            print '"{old_string}" not found in {filename}.'.format(**locals())
+            print ('"{old_string}" not found in {filename}.'.format(**locals()) )
             return
 
     try:
         # Safely write the changed content, if found in the file
         with open(filename, 'w') as f:
-            print 'Changing "{old_string}" to "{new_string}" in {filename}'.format(**locals())
+            print ('Changing "{old_string}" to "{new_string}" in {filename}'.format(**locals()) )
             s = s.replace(old_string, new_string)
             f.write(s)
-    except OSError, e:
+    except (OSError, e):
         print("Error: %s -- target:\"%s\"" % (e, filename) )
         return
     # TODO: need to handle permission error 
-    except IOError, e:
+    except (IOError, e):
         print("Error: %s -- target:\"%s\"" % (e, filename) )
         return
 
