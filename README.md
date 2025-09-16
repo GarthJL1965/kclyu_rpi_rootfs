@@ -31,6 +31,19 @@ Usage: .//build_rootfs.sh command [options]
 ```
 *note1 : Download the image file from [Raspberry PI download page](https://www.raspberrypi.org/downloads/raspberry-pi-os/) and if possible, use the img file after unzip the img.zip file after download completed.*
 ## Making RootFS with rsync 
+**NB : This code was originally python2 and as such wouldn' run on python3.**  
+
+Things I've done:  
+- Created a new python3 branch
+- bracketed exceptions, so OSError,e -> (OSError, e), ditto IOErrors  
+- Fixed some print statments (surrounded with brackets)
+
+ToDo:
+- Add better logging & command-line options  
+- Possibly add dry-run flag  
+- Handle libstdc 'update'/'upgrade'  
+
+
 ```
 cd ~/Workspace/rpi_rootfs
 mkdir -p rootfs
